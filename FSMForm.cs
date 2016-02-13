@@ -37,14 +37,8 @@ namespace FSMForm
         {
             foreach (Picture pic in picList)
             {
-                ((System.ComponentModel.ISupportInitialize)pic).BeginInit();
-                this.SuspendLayout();
-
                 pic.Click += new System.EventHandler(this.Picture_Click);
                 this.Controls.Add(pic);
-
-                ((System.ComponentModel.ISupportInitialize)pic).EndInit();
-                this.ResumeLayout(false);
             }
         }
     }
