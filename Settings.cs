@@ -1,4 +1,4 @@
-﻿namespace FSMForm.Properties {
+﻿namespace FSMProject.Properties {
     
     
     // Этот класс позволяет обрабатывать определенные события в классе параметров:

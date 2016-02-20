@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FSMForm
+namespace FSMProject
 {
     public partial class FSMForm : Form
     {
@@ -19,7 +19,7 @@ namespace FSMForm
 
         private void Picture_Click(object sender, EventArgs e)
         {
-            //Interface.DrawOnOffset(Interface.picList[1], 1, -1);
+            MessageBox.Show(Robot.D.Down.ToString());
         }
 
         private void FSMForm_Load(object sender, EventArgs e)
@@ -59,11 +59,11 @@ namespace FSMForm
         /// <param name = "Step">"Человеческая" координата.</param>
         private struct PosInfo
         {
-            public int Scale, Step, Min, Max, Zero;
+            public int TxtScl, Step, Min, Max, Zero;
             
             public PosInfo(int scl, int stp, int min, int max, int zr)
             {
-                Scale = scl; //Texture Scale - масштабирование текстуры
+                TxtScl = scl; //Texture Scale - масштабирование текстуры
                 Step = stp * scl; Min = min * scl; Max = max * scl; Zero = zr * scl;
             }
         }
@@ -89,9 +89,9 @@ namespace FSMForm
         public static void DrawObject(MovingObject obj)
         {
            if (CoordToPos(X, obj.coordX) <= X.Max && CoordToPos(X, obj.coordX) >= X.Min)
-                obj.pic.Left = CoordToPos(X, obj.coordX) - obj.width * X.Scale / 2;
+                obj.pic.Left = CoordToPos(X, obj.coordX) - obj.width * X.TxtScl / 2;
            if (CoordToPos(Y, obj.coordY) <= Y.Max && CoordToPos(Y, obj.coordY) >= Y.Min)
-                obj.pic.Top = CoordToPos(Y, obj.coordY) - obj.height * Y.Scale / 2;
+                obj.pic.Top = CoordToPos(Y, obj.coordY) - obj.height * Y.TxtScl / 2;
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace FSMForm
         /// </summary>
         public static void SetObjPicture(MovingObject obj)
         {
-            picList.Add(new Picture(obj.name, obj.id, obj.width * X.Scale, obj.height * Y.Scale));
+            picList.Add(new Picture(obj.name, obj.id, obj.width * X.TxtScl, obj.height * Y.TxtScl));
             obj.pic = picList[picList.Count-1];
         }
     }
@@ -147,6 +147,10 @@ namespace FSMForm
 
     class Robot : MovingObject
     {
+        public enum D { Up, Right, Left, Down } //Direction - направление
+        public static string[] dir = { "Up", "Right", "Left", "Down" };
+        public static int[] delta = { 0, 0 };
+
         public Robot(string name, int id)
         {
             this.name = name;
@@ -167,16 +171,16 @@ namespace FSMForm
                     rob.MoveUp();
                     break;
 
+                case "Right":
+                    rob.MoveRight();
+                    break;
+
                 case "Down":
                     rob.MoveDown();
                     break;
 
                 case "Left":
                     rob.MoveLeft();
-                    break;
-
-                case "Right":
-                    rob.MoveRight();
                     break;
 
                 default:
@@ -188,6 +192,14 @@ namespace FSMForm
             if(coordY + 1 <= 8)
                 this.coordY++;
             Interface.DrawObject(this);
+        }
+        public void MoveRight()
+        {
+            if (coordX + 1 <= 8)
+            {
+                this.coordX++;
+                Interface.DrawObject(this);
+            }
         }
         public void MoveDown()
         {
@@ -202,14 +214,6 @@ namespace FSMForm
             if (coordX - 1 >= -8)
             {
                 this.coordX--;
-                Interface.DrawObject(this);
-            }
-        }
-        public void MoveRight()
-        {
-            if (coordX + 1 <= 8)
-            {
-                this.coordX++;
                 Interface.DrawObject(this);
             }
         }

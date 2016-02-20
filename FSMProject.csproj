@@ -7,8 +7,8 @@
     <ProjectGuid>{6CEAA236-6D83-41D5-94A4-326FE8797DEE}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FSMForm</RootNamespace>
-    <AssemblyName>FSMForm</AssemblyName>
+    <RootNamespace>FSMProject</RootNamespace>
+    <AssemblyName>FSMProject</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
