@@ -19,32 +19,57 @@ namespace FSMProject
 
         private void Picture_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(Robot.D.Down.ToString());
+            
         }
 
         private void FSMForm_Load(object sender, EventArgs e)
         {
             this.KeyDown += new KeyEventHandler(KeyDownEventHandler);
 
-            Machine.Init();
-            RegisterPictures(Interface.picList);
+            FSMBase.InitObjects();
+            RegisterObjPictures(FSMBase.objList);
         }
 
         private void KeyDownEventHandler(object sender, KeyEventArgs e)
         {
-            Robot.RobotController(Machine.rob, e.KeyCode.ToString());
+            FSMBase.rob.Move(e.KeyCode.ToString().ElementAt(0));
         }
 
         /// <summary>
         /// Метод для регистрации картинок, соответствующих двигающимся объектам.
         /// </summary>
-        private void RegisterPictures(List<Picture> picList)
+        private void RegisterObjPictures(List<MovingObject> objList)
         {
-            foreach (Picture pic in picList)
+            foreach (MovingObject obj in objList)
             {
-                pic.Click += new System.EventHandler(this.Picture_Click);
-                this.Controls.Add(pic);
+                obj.pic.Click += new System.EventHandler(this.Picture_Click);
+                this.Controls.Add(obj.pic);
             }
+        }
+    }
+
+    static class FSMBase
+    {
+        public static Robot rob;
+        public static Target tar;
+
+        public static List<MovingObject> objList = null;
+
+        /// <summary>
+        /// Выполняется при инициализации запуске программы.
+        /// Здесь создаются и инициализируются двигающиеся объекты.
+        /// </summary>
+        public static void InitObjects()
+        {
+            objList = new List<MovingObject>(0);
+            objList.Add(new Robot("Savvy", 0));
+            objList.Add(new Target("Portal", 0));
+            rob = (Robot)objList[0];
+            tar = (Target)objList[1];
+            Interface.SetObjPicture(rob, "Red");
+            Interface.DrawObject(rob);
+            Interface.SetObjPicture(tar, "Green");
+            Interface.DrawObject(tar);
         }
     }
 
@@ -71,8 +96,6 @@ namespace FSMProject
         private static PosInfo X = new PosInfo(5, 6, -3, 98, 49); //масштаб, шаг между координатами, минимальная, максимальная координата, координата нуля. (Всё умножается на масштаб)
         private static PosInfo Y = new PosInfo(5, -6, -3, 98, 49); //-6 из-за того, что в форме координаты из верхнего левого угла, а не левого нижнего
 
-        public static List<Picture> picList = new List<Picture>(0);
-
         /// <summary>
         /// Метод, преобразующий "человеческие" координаты в пиксели.
         /// </summary>
@@ -97,10 +120,15 @@ namespace FSMProject
         /// <summary>
         /// Метод, задающий картинку двигающемуся объекту.
         /// </summary>
-        public static void SetObjPicture(MovingObject obj)
+        /// <param name = "obj">Объект, содержащий картинку.</param>
+        /// <param name = "col">Название цвета картинки.</param>
+        public static void SetObjPicture(MovingObject obj, string col)
         {
-            picList.Add(new Picture(obj.name, obj.id, obj.width * X.TxtScl, obj.height * Y.TxtScl));
-            obj.pic = picList[picList.Count-1];
+            obj.pic = new PictureBox();
+            obj.pic.Name = obj.name + " " + obj.id;
+            obj.pic.Width = obj.width * X.TxtScl;
+            obj.pic.Height = obj.height * Y.TxtScl;
+            obj.pic.BackColor = Color.FromName(col);
         }
     }
 
@@ -109,23 +137,7 @@ namespace FSMProject
     /// </summary>
     static class Machine
     {
-        public static Robot rob;
-        public static Target tar;
 
-        /// <summary>
-        /// Выполняется при инициализации конечного автомата.
-        /// Здесь создаются и инициализируются двигающиеся объекты.
-        /// </summary>
-        public static void Init() {
-            rob = new Robot("Savvy", 0);
-            tar = new Target("Portal", 0);
-            Interface.SetObjPicture(rob);
-            Interface.DrawObject(rob);
-            Interface.SetObjPicture(tar);
-            Interface.DrawObject(tar);
-            rob.pic.BackColor = System.Drawing.Color.Red;
-            tar.pic.BackColor = System.Drawing.Color.Green;
-        }
     }
 
     /// <summary>
@@ -139,18 +151,11 @@ namespace FSMProject
         public int coordY;
         public int width;
         public int height;
-        public Picture pic;
-
-        public MovingObject() { }
-
+        public PictureBox pic;
     }
 
     class Robot : MovingObject
     {
-        public enum D { Up, Right, Left, Down } //Direction - направление
-        public static string[] dir = { "Up", "Right", "Left", "Down" };
-        public static int[] delta = { 0, 0 };
-
         public Robot(string name, int id)
         {
             this.name = name;
@@ -160,62 +165,37 @@ namespace FSMProject
             this.width = this.height = 6;
         }
 
-        /// <summary>
-        /// Статический метод для управления роботом.
-        /// </summary>
-        public static void RobotController(Robot rob, string key)
+        public void Move(char dir)
         {
-            switch (key)
+            const char up = 'U', right = 'R', down = 'D', left = 'L';
+
+            switch(dir)
             {
-                case "Up":
-                    rob.MoveUp();
+                case up:
+                    if (coordY + 1 <= 8)
+                        this.coordY++;
                     break;
 
-                case "Right":
-                    rob.MoveRight();
+                case right:
+                    if (coordX + 1 <= 8)
+                        this.coordX++;
                     break;
 
-                case "Down":
-                    rob.MoveDown();
+                case down:
+                    if (coordY - 1 >= -8)
+                        this.coordY--;
                     break;
 
-                case "Left":
-                    rob.MoveLeft();
+                case left:
+                    if (coordX - 1 >= -8)
+                        this.coordX--;
                     break;
 
                 default:
                     break;
             }
-        }
-        public void MoveUp()
-        {
-            if(coordY + 1 <= 8)
-                this.coordY++;
+
             Interface.DrawObject(this);
-        }
-        public void MoveRight()
-        {
-            if (coordX + 1 <= 8)
-            {
-                this.coordX++;
-                Interface.DrawObject(this);
-            }
-        }
-        public void MoveDown()
-        {
-            if (coordY - 1 >= -8)
-            {
-                this.coordY--;
-                Interface.DrawObject(this);
-            }
-        }
-        public void MoveLeft()
-        {
-            if (coordX - 1 >= -8)
-            {
-                this.coordX--;
-                Interface.DrawObject(this);
-            }
         }
     }
 
@@ -228,27 +208,6 @@ namespace FSMProject
             this.coordX = -3;
             this.coordY = 4;
             this.width = this.height = 8;
-        }
-    }
-
-    /// <summary>
-    /// Класс для мнгновенной инициализации основных полей картинки.
-    /// </summary>
-    public class Picture : System.Windows.Forms.PictureBox
-    {
-        /// <summary>
-        /// Метод инициализации основных полей картинки.
-        /// </summary>
-        /// <param name = "name">Имя картинки, аналогичное имени двигающегося объекта.</param>
-        /// <param name = "id">ID картинки (объекта).</param>
-        /// <param name = "width">Ширина картинки.</param>
-        /// <param name = "height">Высота картинки.</param>
-        /// <param name = "posX">Пиксельная координата X центра картинки.</param>
-        /// <param name = "posY">Пиксельная координата Y центра картинки.</param>
-        public Picture(string name, int id, int width, int height)
-        {
-            this.Name = name + " " + id;
-            this.Size = new System.Drawing.Size(width, height);
         }
     }
 }
