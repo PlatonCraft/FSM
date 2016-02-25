@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -19,7 +20,7 @@ namespace FSMProject
 
         private void Picture_Click(object sender, EventArgs e)
         {
-            
+           // MessageBox.Show(new Random().Next(0, 2).ToString());
         }
 
         private void FSMForm_Load(object sender, EventArgs e)
@@ -32,7 +33,14 @@ namespace FSMProject
 
         private void KeyDownEventHandler(object sender, KeyEventArgs e)
         {
-            FSMBase.rob.Move(e.KeyCode.ToString().ElementAt(0));
+            string key = e.KeyCode.ToString();
+            char k = key.ElementAt(0);
+
+            if (key == "Space")
+                FSMBase.Start();
+
+            if (k == 'U' || k == 'R' || k == 'D' || k == 'L')
+                FSMBase.rob.MakeStep(k);
         }
 
         /// <summary>
@@ -70,6 +78,11 @@ namespace FSMProject
             Interface.DrawObject(rob);
             Interface.SetObjPicture(tar, "Green");
             Interface.DrawObject(tar);
+        }
+
+        public static void Start()
+        {
+            rob.ReachTarget(tar);
         }
     }
 
@@ -132,12 +145,92 @@ namespace FSMProject
         }
     }
 
+
     /// <summary>
     /// Главный класс конечного автомата.
     /// </summary>
     static class Machine
     {
+        public class State
+        {
+            public char input, output;
+            public bool isRight;
 
+            public State(char input, char output, bool flag)
+            {
+                this.input = input;
+                this.output = output;
+                isRight = flag;
+            }
+        }
+
+        public static List<State> statesList = new List<State>(0);
+
+        #region публичные методы
+        public static bool RightOutputExistsForInput(char input)
+        {
+            return GetRightStateForInput(input) != null;
+        }
+
+        public static bool IsOutputWrongForInput(char input, char output)
+        {
+            List<State> stList = GetStatesForInput(input);
+            if (stList == null)
+                return false;
+
+            foreach (State st in stList)
+            {
+                if (st.input == input && st.output == output && !st.isRight)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static char GetRightOutputForInput(char input)
+        {
+            State st = GetRightStateForInput(input);
+
+            return st != null ? st.output : '\0';
+        }
+
+        public static void SetRightOutputForInput(char input, char output)
+        {
+            statesList.Add(new State(input, output, true));
+        }
+
+        public static void SetWrongOutputForInput(char input, char output)
+        {
+            statesList.Add(new State(input, output, false));
+        }
+        #endregion 
+
+        static List<State> GetStatesForInput(char input)
+        {
+            List<State> retList = new List<State>(0);
+
+            foreach (State st in statesList)
+            {
+                if (st.input == input)
+                    retList.Add(st);
+            }
+            return retList.Any() ? retList : null;
+        }
+        
+        static State GetRightStateForInput(char input)
+        {
+            List<State> stList = GetStatesForInput(input);
+            if (stList == null)
+                return null;
+
+            foreach (State st in stList)
+            {
+                if (st.input == input && st.isRight)
+                    return st;
+            }
+            
+            return null;
+        }
     }
 
     /// <summary>
@@ -156,20 +249,24 @@ namespace FSMProject
 
     class Robot : MovingObject
     {
+        Logic logic;
+        public const char up = 'U', right = 'R', down = 'D', left = 'L';
+
         public Robot(string name, int id)
         {
+            logic = new Logic(this);
             this.name = name;
             this.id = id;
-            this.coordX = 0;
-            this.coordY = 0;
-            this.width = this.height = 6;
+            coordX = 0;
+            coordY = 0;
+            width = height = 6;
         }
 
-        public void Move(char dir)
+        public void MakeStep(char dir)
         {
-            const char up = 'U', right = 'R', down = 'D', left = 'L';
+            logic.RememberCoords();
 
-            switch(dir)
+            switch (dir)
             {
                 case up:
                     if (coordY + 1 <= 8)
@@ -194,8 +291,122 @@ namespace FSMProject
                 default:
                     break;
             }
-
+        
             Interface.DrawObject(this);
+            Thread.Sleep(300);
+        }
+
+        public void ReachTarget(Target tar)
+        {
+            logic.SelectTarget(tar);
+            char dir = logic.ChooseDirectionToCurrentTarget();
+
+            while (dir != '\0')
+            {
+                logic.TryToMove(dir);
+                dir = logic.ChooseDirectionToCurrentTarget();
+            }
+        }
+    }
+
+    class Logic
+    {
+        Robot rob;
+        Target curTar;
+        
+        int distX, distY;
+        int prevX, prevY;
+
+        char[] dirArr;
+
+        public Logic(Robot rob)
+        {
+            this.rob = rob;
+            dirArr = new char[] { Robot.up, Robot.right, Robot.down, Robot.left };
+        }
+
+        public void SelectTarget(Target tar)
+        {
+            curTar = tar;
+        }
+
+        public char ChooseDirectionToCurrentTarget()
+        {
+            CalcDistanceToCurrentTarget();
+
+            if (distX != 0)
+                return (distX > 0) ? Robot.right : Robot.left;
+            else if (distY != 0)
+                return (distY > 0) ? Robot.up : Robot.down;
+            else return '\0';
+
+            //TODO: Нужно проверить, что ничего не зависит от названия направления, а только от соответствий команд и действий.
+        }
+
+        public void TryToMove(char dir)
+        {
+            char rightOut = Machine.GetRightOutputForInput(dir);
+
+
+            if (Machine.RightOutputExistsForInput(dir))
+                rob.MakeStep(Machine.GetRightOutputForInput(dir));
+            else
+                LearnToMove(dir);
+        }
+
+        public void RememberCoords()
+        {
+            prevX = rob.coordX;
+            prevY = rob.coordY;
+        }
+
+        void LearnToMove(char needDir)
+        {
+            char stepDir;
+            char axis;
+            axis = (needDir == Robot.right || needDir == Robot.left) ? 'X' : 'Y';
+
+            do
+            {
+                stepDir = ChooseRandStep(needDir);
+                rob.MakeStep(stepDir);
+                if (IsLastStepRight(axis))
+                    Machine.SetRightOutputForInput(needDir, stepDir);
+                else
+                    Machine.SetWrongOutputForInput(needDir, stepDir);
+            }
+            while (!Machine.RightOutputExistsForInput(needDir));
+        }
+
+        char ChooseRandStep(char needDir)
+        {
+            char stepDir = '\0';
+            Random rnd = new Random();
+            do { //перебор направлений движения не закончится, пока мы знаем, что предполагаемое направление наверно.
+                stepDir = dirArr[rnd.Next(0, dirArr.Count())];
+            } while (Machine.IsOutputWrongForInput(needDir, stepDir));
+
+            return stepDir;
+        }
+
+        void CalcDistanceToCurrentTarget()
+        {
+            distX = curTar.coordX - rob.coordX;
+            distY = curTar.coordY - rob.coordY;
+        }
+
+        bool IsLastStepRight(char axis)
+        {
+            CalcDistanceToCurrentTarget();
+
+            int prevDistX = curTar.coordX - prevX;
+            int prevDistY = curTar.coordY - prevY;
+
+            if (Math.Abs(distX) < Math.Abs(prevDistX) && axis == 'X')
+                return true;
+            else if (Math.Abs(distY) < Math.Abs(prevDistY) && axis == 'Y') //короче, нужно дать ему понять, что приближаться ему нужно было по другой оси
+                return true;
+            else return false;
         }
     }
 
