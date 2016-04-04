@@ -1,5 +1,7 @@
 ﻿using System.Windows.Forms;
 using System.Drawing;
+using System;
+using System.Collections.Generic;
 
 namespace FSMProject
 {
@@ -11,54 +13,85 @@ namespace FSMProject
         /// <summary>
         /// Структура, хранящая переменные, зависящие от текстуры фона.
         /// </summary>
-        private struct PosInfo
+        private class PosInfo
         {
-            public int TxtScl, Step, Min, Max, Zero;
-            
+            public int Step, Min, Max, Zero;
 
-            public PosInfo(int scl, int stp, int min, int max, int zr)
+            public PosInfo(int stp, int min, int max, int zr)
             {
-                TxtScl = scl; //Texture Scale - масштабирование текстуры
-                Step = stp * scl; Min = min * scl; Max = max * scl; Zero = zr * scl;
+                Step = stp; Min = min; Max = max; Zero = zr;
             }
         }
 
-        private static PosInfo X = new PosInfo(5, 6, -3, 98, 49); //масштаб, шаг между координатами, минимальная, максимальная координата, координата нуля. (Всё умножается на масштаб)
-        private static PosInfo Y = new PosInfo(5, -6, -3, 98, 49); //-6 из-за того, что в форме координаты из верхнего левого угла, а не левого нижнего
+        private static FSMForm form;
+        private static PictureBox picPlane;
+        private static ListView lstStates;
+        private static List<MovingObject> objList;
+        private static PosInfo X; //шаг между координатами, минимальная, максимальная координата, координата нуля. (Всё умножается на масштаб)
+        private static PosInfo Y; //-6 из-за того, что в форме координаты из верхнего левого угла, а не левого нижнего
+
+        public static void Init(FSMForm f)
+        {
+            form = f;
+            picPlane = form.getPictureBox();
+            lstStates = form.getListView();
+            objList = FSMBase.objList;
+            X = new PosInfo(25, 0, picPlane.Size.Width, picPlane.Size.Width / 2);
+            Y = new PosInfo(25, 0, picPlane.Size.Height, picPlane.Size.Height / 2);
+        }
+
+        public static void DrawObjects(Graphics graph)
+        {
+            if (objList != null && objList.Count != 0)
+                foreach (MovingObject obj in objList)
+                    graph.FillRectangle(new SolidBrush(Color.FromName(obj.color)), CoordToPos(X, obj.coordX, obj.width), CoordToPos(Y, obj.coordY, obj.height), obj.width, obj.height);
+        }
+
+        public static void DrawPlane(Graphics graph)
+        {
+            Pen penThin = new Pen(Color.Black, 3F);
+            Pen penThick = new Pen(Color.Black, 6F);
+
+            for (int i = X.Min / X.Step + 1; i < X.Max / X.Step; i++)//отрисовка вертикальных линий
+            {
+                if (i == X.Zero / X.Step) //условие для отрисовки толстой линии в центре
+                    graph.DrawLine(penThick, i * X.Step, Y.Min / Y.Step, i * X.Step, Y.Max);
+                else
+                    graph.DrawLine(penThin, i * X.Step, Y.Min / Y.Step, i * X.Step, Y.Max);
+            }
+
+            for (int i = Y.Min / Y.Step + 1; i < Y.Max / Y.Step; i++)//отрисовка горизонтальных линий
+            {
+                if (i == Y.Zero / Y.Step) //условие для отрисовки толстой линии в центре
+                    graph.DrawLine(penThick, X.Min / X.Step, i * Y.Step, X.Max, i * Y.Step);
+                else
+                    graph.DrawLine(penThin, X.Min / X.Step, i * Y.Step, X.Max, i * Y.Step);
+            }
+        }
+
+        public static void RefreshPlane()
+        {
+            picPlane.Refresh();
+        }
+
+        public static void RefreshList(string direction, string action)
+        {
+            lstStates.Items.Add(new ListViewItem(new string[] { direction, action }));
+            lstStates.Refresh();
+        }
+
 
         /// <summary>
         /// Метод, преобразующий "человеческие" координаты в пиксели.
         /// </summary>
         /// <param name = "posInfo">Структура с данными о специфике преобразования.</param>
         /// <param name = "coord">"Человеческая" координата.</param>
-        private static int CoordToPos(PosInfo posInfo, int coord)
+        private static int CoordToPos(PosInfo posInfo, int coord, int size)
         {
-            return posInfo.Zero + coord * posInfo.Step;
-        }
-
-        /// <summary>
-        /// Метод для отрисовки картинки объекта на заданных координатах.
-        /// </summary>
-        public static void DrawObject(MovingObject obj)
-        {
-            if (CoordToPos(X, obj.coordX) <= X.Max && CoordToPos(X, obj.coordX) >= X.Min)
-                obj.pic.Left = CoordToPos(X, obj.coordX) - obj.width * X.TxtScl / 2;
-            if (CoordToPos(Y, obj.coordY) <= Y.Max && CoordToPos(Y, obj.coordY) >= Y.Min)
-                obj.pic.Top = CoordToPos(Y, obj.coordY) - obj.height * Y.TxtScl / 2;
-        }
-
-        /// <summary>
-        /// Метод, задающий картинку двигающемуся объекту.
-        /// </summary>
-        /// <param name = "obj">Объект, содержащий картинку.</param>
-        /// <param name = "col">Название цвета картинки.</param>
-        public static void SetObjPicture(MovingObject obj, string col)
-        {
-            obj.pic = new PictureBox();
-            obj.pic.Name = obj.name + " " + obj.id;
-            obj.pic.Width = obj.width * X.TxtScl;
-            obj.pic.Height = obj.height * Y.TxtScl;
-            obj.pic.BackColor = Color.FromName(col);
+            if (posInfo == X)
+                return posInfo.Zero + coord * posInfo.Step - size / 2;
+            else
+                return posInfo.Zero - coord * posInfo.Step - size / 2;
         }
     }
 }

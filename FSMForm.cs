@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace FSMProject
@@ -12,9 +13,12 @@ namespace FSMProject
             InitializeComponent();
         }
 
+        public PictureBox getPictureBox() { return pbCoordPlane; }
+        public ListView getListView() { return lvStates; }
+
         private void Picture_Click(object sender, EventArgs e)
         {
-           // MessageBox.Show(new Random().Next(0, 2).ToString());
+            // MessageBox.Show(new Random().Next(0, 2).ToString());
         }
 
         private void FSMForm_Load(object sender, EventArgs e)
@@ -22,37 +26,31 @@ namespace FSMProject
             this.KeyDown += new KeyEventHandler(KeyDownEventHandler);
 
             FSMBase.InitObjects();
-            RegisterObjPictures(FSMBase.objList);
+            Interface.Init(this);
         }
 
         private void KeyDownEventHandler(object sender, KeyEventArgs e)
         {
-            string key = e.KeyCode.ToString();
-            char k = key.ElementAt(0);
-
-            if (key == "Space")
-                FSMBase.Start();
-
-            if (k == 'U' || k == 'R' || k == 'D' || k == 'L')
-                FSMBase.rob.MakeStep(k);
+            if (e.KeyCode == Keys.W)
+                FSMBase.rob.MakeStep(Robot.up, 0);
+            else if (e.KeyCode == Keys.S)
+                FSMBase.rob.MakeStep(Robot.down, 0);
+            else if (e.KeyCode == Keys.A)
+                FSMBase.rob.MakeStep(Robot.left, 0);
+            else if (e.KeyCode == Keys.D)
+                FSMBase.rob.MakeStep(Robot.right, 0);
 
         }
 
-        /// <summary>
-        /// Метод для регистрации картинок, соответствующих двигающимся объектам.
-        /// </summary>
-        private void RegisterObjPictures(List<MovingObject> objList)
+        private void pbCoordPlane_Paint(object sender, PaintEventArgs e)
         {
-            foreach (MovingObject obj in objList)
-            {
-                obj.pic.Click += new System.EventHandler(this.Picture_Click);
-                this.Controls.Add(obj.pic);
-            }
+            Interface.DrawPlane(e.Graphics);
+            Interface.DrawObjects(e.Graphics);
         }
 
-        private void EditText(float dist)
+        private void btnStart_Click(object sender, EventArgs e)
         {
-            textBox1.Text = Convert.ToString(dist);
+            FSMBase.Start();
         }
     }
 
@@ -70,19 +68,16 @@ namespace FSMProject
         public static void InitObjects()
         {
             objList = new List<MovingObject>(0);
-            objList.Add(new Robot("Savvy", 0));
-            objList.Add(new Target("Portal", 0));
-            rob = (Robot)objList[0];
-            tar = (Target)objList[1];
-            Interface.SetObjPicture(rob, "Red");
-            Interface.DrawObject(rob);
-            Interface.SetObjPicture(tar, "Green");
-            Interface.DrawObject(tar);
+            rob = new Robot("Savvy", 0, "Red");
+            tar = new Target("Portal", 0, "Green");
+            objList.Add(tar);
+            objList.Add(rob);
         }
 
         public static void Start()
         {
             rob.ReachTarget(tar);
+            //rob.MakeStep(Robot.left);
         }
     }
 }
