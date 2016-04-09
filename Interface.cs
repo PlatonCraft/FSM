@@ -1,7 +1,6 @@
 ﻿using System.Windows.Forms;
 using System.Drawing;
 using System;
-using System.Collections.Generic;
 
 namespace FSMProject
 {
@@ -26,24 +25,42 @@ namespace FSMProject
         private static FSMForm form;
         private static PictureBox picPlane;
         private static ListView lstStates;
-        private static List<MovingObject> objList;
+        private static TextBox txtDist;
+        private static TextBox txtLrnSteps;
+
+        private static int lrnSteps = 0;
+        
         private static PosInfo X; //шаг между координатами, минимальная, максимальная координата, координата нуля. (Всё умножается на масштаб)
         private static PosInfo Y; //-6 из-за того, что в форме координаты из верхнего левого угла, а не левого нижнего
+
+        public static int maxCoord = 10;
+
+        public static bool CoordsReachable(int coordX, int coordY)
+        {
+            return Math.Abs(coordX) <= 10 && Math.Abs(coordY) <= 10;
+        }
 
         public static void Init(FSMForm f)
         {
             form = f;
-            picPlane = form.getPictureBox();
-            lstStates = form.getListView();
-            objList = FSMBase.objList;
+            picPlane = form.getPicPlane();
+            lstStates = form.getLstStates();
+            txtDist = form.getTxtDist();
+            txtLrnSteps = form.getTxtLrnSteps();
             X = new PosInfo(25, 0, picPlane.Size.Width, picPlane.Size.Width / 2);
             Y = new PosInfo(25, 0, picPlane.Size.Height, picPlane.Size.Height / 2);
+
+            Reset();
         }
 
         public static void DrawObjects(Graphics graph)
         {
-            if (objList != null && objList.Count != 0)
-                foreach (MovingObject obj in objList)
+            if (Target.tarList != null && Target.tarList.Count != 0)
+                foreach (MovingObject obj in Target.tarList)
+                    graph.FillRectangle(new SolidBrush(Color.FromName(obj.color)), CoordToPos(X, obj.coordX, obj.width), CoordToPos(Y, obj.coordY, obj.height), obj.width, obj.height);
+
+            if (Robot.robList != null && Robot.robList.Count != 0)
+                foreach (MovingObject obj in Robot.robList)
                     graph.FillRectangle(new SolidBrush(Color.FromName(obj.color)), CoordToPos(X, obj.coordX, obj.width), CoordToPos(Y, obj.coordY, obj.height), obj.width, obj.height);
         }
 
@@ -80,7 +97,32 @@ namespace FSMProject
             lstStates.Refresh();
         }
 
+        public static void RefreshDistance(int x, int y)
+        {
+            txtDist.Text = x + " | " + y + " | " + Math.Sqrt(x * x + y * y).ToString("F3");
+            txtDist.Refresh();
+        }
 
+        public static void Reset()
+        {
+            lstStates.Items.Clear();
+            txtDist.Text = "0 | 0 | 0";
+            txtLrnSteps.Text = "0";
+            lrnSteps = 0;
+
+            lstStates.Refresh();
+            txtDist.Refresh();
+            txtLrnSteps.Refresh();
+            RefreshPlane();
+        }
+
+        public static void LrnStepAdd()
+        {
+            lrnSteps++;
+            txtLrnSteps.Text = lrnSteps.ToString();
+            txtLrnSteps.Refresh();
+        }
+        
         /// <summary>
         /// Метод, преобразующий "человеческие" координаты в пиксели.
         /// </summary>

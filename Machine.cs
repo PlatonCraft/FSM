@@ -23,6 +23,11 @@ namespace FSMProject
 
         static List<State> statesList = new List<State>(0);
         
+        public static void Reset()
+        {
+            statesList = new List<State>(0); //Указываем на новый, а старый по идее должен удалиться сборщиком мусора
+        }
+
         public static bool RightOutputExistsForInput(char input)
         {
             return GetRightStateForInput(input) != null;

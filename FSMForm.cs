@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace FSMProject
@@ -13,8 +10,10 @@ namespace FSMProject
             InitializeComponent();
         }
 
-        public PictureBox getPictureBox() { return pbCoordPlane; }
-        public ListView getListView() { return lvStates; }
+        public PictureBox getPicPlane() { return pbCoordPlane; }
+        public ListView getLstStates() { return lvStatesList; }
+        public TextBox getTxtDist() { return tbDist; }
+        public TextBox getTxtLrnSteps() { return tbLrnSteps; }
 
         private void Picture_Click(object sender, EventArgs e)
         {
@@ -23,23 +22,20 @@ namespace FSMProject
 
         private void FSMForm_Load(object sender, EventArgs e)
         {
-            this.KeyDown += new KeyEventHandler(KeyDownEventHandler);
-
-            FSMBase.InitObjects();
             Interface.Init(this);
+            FSMBase.InitObjects();
         }
 
-        private void KeyDownEventHandler(object sender, KeyEventArgs e)
+        private void FSMForm_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.W)
-                FSMBase.rob.MakeStep(Robot.up, 0);
+                FSMBase.curRob.MakeStep(Robot.up, 0);
             else if (e.KeyCode == Keys.S)
-                FSMBase.rob.MakeStep(Robot.down, 0);
+                FSMBase.curRob.MakeStep(Robot.down, 0);
             else if (e.KeyCode == Keys.A)
-                FSMBase.rob.MakeStep(Robot.left, 0);
+                FSMBase.curRob.MakeStep(Robot.left, 0);
             else if (e.KeyCode == Keys.D)
-                FSMBase.rob.MakeStep(Robot.right, 0);
-
+                FSMBase.curRob.MakeStep(Robot.right, 0);
         }
 
         private void pbCoordPlane_Paint(object sender, PaintEventArgs e)
@@ -52,32 +48,84 @@ namespace FSMProject
         {
             FSMBase.Start();
         }
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            FSMBase.Reset();
+        }
+
+        private void tbAdd_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            //если введена не цифра, не backspace, не минус, то событие обработано (изменять текст не нужно)
+            if (!Char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back && e.KeyChar != '-')
+            {
+                e.Handled = true;
+            }
+
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            int addX, addY;
+
+            try
+            {
+                addX = Convert.ToInt32(tbAddX.Text);
+                addY = Convert.ToInt32(tbAddY.Text);
+
+                if (Interface.CoordsReachable(addX, addY))
+                    if (((Button)sender).Equals(btnAddRob))
+                        FSMBase.AddRobot(addX, addY);
+                    else FSMBase.AddTarget(addX, addY);
+                else throw new FormatException();//ну раз он туда попадёт при ошибке, то почему бы и нет?
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Coords should be integer numbers\nunder " + Interface.maxCoord + " and above -" + Interface.maxCoord);
+            }
+           
+        }
+
+        private void btnAddTar_Click(object sender, EventArgs e)
+        {
+            FSMBase.AddTarget(Convert.ToInt32(tbAddX.Text), Convert.ToInt32(tbAddY.Text));
+        }
     }
 
     static class FSMBase
     {
-        public static Robot rob;
-        public static Target tar;
+        public static Robot curRob;
 
-        public static List<MovingObject> objList = null;
-
-        /// <summary>
-        /// Выполняется при инициализации запуске программы.
-        /// Здесь создаются и инициализируются двигающиеся объекты.
-        /// </summary>
         public static void InitObjects()
         {
-            objList = new List<MovingObject>(0);
-            rob = new Robot("Savvy", 0, "Red");
-            tar = new Target("Portal", 0, "Green");
-            objList.Add(tar);
-            objList.Add(rob);
+            curRob = new Robot("Savvy", 0, "Pink");
+            Interface.RefreshPlane();
+        }
+
+        public static void AddRobot(int coordX, int coordY)
+        {
+            new Robot(coordX, coordY);
+            Interface.RefreshPlane();
+        }
+
+        public static void AddTarget(int coordX, int coordY)
+        { 
+            new Target(coordX, coordY);
+            Interface.RefreshPlane();
         }
 
         public static void Start()
         {
-            rob.ReachTarget(tar);
-            //rob.MakeStep(Robot.left);
+            curRob.ReachTargetsAddOrder(Target.tarList);
+        }
+
+        public static void Reset()
+        {
+            Machine.Reset();
+            MovingObject.DeleteAll();
+            Interface.Reset();
+
+            InitObjects();
         }
     }
 }
