@@ -54,7 +54,7 @@
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(75, 23);
             this.btnStart.TabIndex = 0;
-            this.btnStart.Text = "Start";
+            this.btnStart.Text = "Запуск";
             this.btnStart.UseVisualStyleBackColor = true;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
@@ -74,6 +74,7 @@
             this.lvStatesList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnDirection,
             this.columnAction});
+            this.lvStatesList.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold);
             this.lvStatesList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lvStatesList.HideSelection = false;
             this.lvStatesList.LabelWrap = false;
@@ -90,34 +91,34 @@
             // 
             // columnDirection
             // 
-            this.columnDirection.Text = "Direction";
+            this.columnDirection.Text = "Направление";
             this.columnDirection.Width = 140;
             // 
             // columnAction
             // 
-            this.columnAction.Text = "Action";
+            this.columnAction.Text = "Действие";
             this.columnAction.Width = 140;
             // 
             // labelStatesList
             // 
             this.labelStatesList.AutoSize = true;
-            this.labelStatesList.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.labelStatesList.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.labelStatesList.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.labelStatesList.Location = new System.Drawing.Point(546, 350);
+            this.labelStatesList.Location = new System.Drawing.Point(545, 347);
             this.labelStatesList.Name = "labelStatesList";
-            this.labelStatesList.Size = new System.Drawing.Size(105, 17);
+            this.labelStatesList.Size = new System.Drawing.Size(266, 20);
             this.labelStatesList.TabIndex = 4;
-            this.labelStatesList.Text = "Conclusions list";
+            this.labelStatesList.Text = "Список полученных соответствий";
             // 
             // tbDist
             // 
-            this.tbDist.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.tbDist.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
             this.tbDist.HideSelection = false;
             this.tbDist.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.tbDist.Location = new System.Drawing.Point(549, 304);
             this.tbDist.Name = "tbDist";
             this.tbDist.ReadOnly = true;
-            this.tbDist.Size = new System.Drawing.Size(147, 22);
+            this.tbDist.Size = new System.Drawing.Size(179, 22);
             this.tbDist.TabIndex = 3;
             this.tbDist.TabStop = false;
             this.tbDist.WordWrap = false;
@@ -125,13 +126,13 @@
             // labelDist
             // 
             this.labelDist.AutoSize = true;
-            this.labelDist.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelDist.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.labelDist.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.labelDist.Location = new System.Drawing.Point(546, 284);
+            this.labelDist.Location = new System.Drawing.Point(545, 281);
             this.labelDist.Name = "labelDist";
-            this.labelDist.Size = new System.Drawing.Size(150, 16);
+            this.labelDist.Size = new System.Drawing.Size(214, 20);
             this.labelDist.TabIndex = 2;
-            this.labelDist.Text = "Distance (X | Y | Radius)";
+            this.labelDist.Text = "Расстояние (X | Y | Радиус)";
             // 
             // btnReset
             // 
@@ -139,19 +140,19 @@
             this.btnReset.Name = "btnReset";
             this.btnReset.Size = new System.Drawing.Size(75, 23);
             this.btnReset.TabIndex = 1;
-            this.btnReset.Text = "Reset";
+            this.btnReset.Text = "Сброс";
             this.btnReset.UseVisualStyleBackColor = true;
             this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
             // 
             // tbLrnSteps
             // 
-            this.tbLrnSteps.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.tbLrnSteps.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
             this.tbLrnSteps.HideSelection = false;
             this.tbLrnSteps.ImeMode = System.Windows.Forms.ImeMode.Disable;
-            this.tbLrnSteps.Location = new System.Drawing.Point(745, 304);
+            this.tbLrnSteps.Location = new System.Drawing.Point(549, 249);
             this.tbLrnSteps.Name = "tbLrnSteps";
             this.tbLrnSteps.ReadOnly = true;
-            this.tbLrnSteps.Size = new System.Drawing.Size(104, 22);
+            this.tbLrnSteps.Size = new System.Drawing.Size(123, 22);
             this.tbLrnSteps.TabIndex = 1;
             this.tbLrnSteps.TabStop = false;
             this.tbLrnSteps.WordWrap = false;
@@ -159,37 +160,39 @@
             // labelLrnSteps
             // 
             this.labelLrnSteps.AutoSize = true;
-            this.labelLrnSteps.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelLrnSteps.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.labelLrnSteps.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.labelLrnSteps.Location = new System.Drawing.Point(742, 285);
+            this.labelLrnSteps.Location = new System.Drawing.Point(545, 226);
             this.labelLrnSteps.Name = "labelLrnSteps";
-            this.labelLrnSteps.Size = new System.Drawing.Size(107, 16);
+            this.labelLrnSteps.Size = new System.Drawing.Size(152, 20);
             this.labelLrnSteps.TabIndex = 0;
-            this.labelLrnSteps.Text = "Steps in learning";
+            this.labelLrnSteps.Text = "Шагов на обучение";
             // 
             // btnAddTar
             // 
+            this.btnAddTar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
             this.btnAddTar.Location = new System.Drawing.Point(630, 10);
             this.btnAddTar.Name = "btnAddTar";
             this.btnAddTar.Size = new System.Drawing.Size(75, 52);
             this.btnAddTar.TabIndex = 2;
-            this.btnAddTar.Text = "Add\r\nTarget";
+            this.btnAddTar.Text = "Добавить\r\nцель";
             this.btnAddTar.UseVisualStyleBackColor = true;
             this.btnAddTar.Click += new System.EventHandler(this.btnAdd_Click);
             // 
             // btnAddRob
             // 
+            this.btnAddRob.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
             this.btnAddRob.Location = new System.Drawing.Point(774, 10);
             this.btnAddRob.Name = "btnAddRob";
             this.btnAddRob.Size = new System.Drawing.Size(75, 52);
             this.btnAddRob.TabIndex = 5;
-            this.btnAddRob.Text = "Add\r\nRobot";
+            this.btnAddRob.Text = "Добавить\r\nробота";
             this.btnAddRob.UseVisualStyleBackColor = true;
             this.btnAddRob.Click += new System.EventHandler(this.btnAdd_Click);
             // 
             // tbAddY
             // 
-            this.tbAddY.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.tbAddY.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
             this.tbAddY.Location = new System.Drawing.Point(734, 40);
             this.tbAddY.MaxLength = 3;
             this.tbAddY.Name = "tbAddY";
@@ -201,7 +204,7 @@
             // 
             // tbAddX
             // 
-            this.tbAddX.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.tbAddX.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
             this.tbAddX.Location = new System.Drawing.Point(734, 12);
             this.tbAddX.MaxLength = 3;
             this.tbAddX.Name = "tbAddX";
@@ -214,7 +217,7 @@
             // labelAddX
             // 
             this.labelAddX.AutoSize = true;
-            this.labelAddX.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelAddX.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
             this.labelAddX.ForeColor = System.Drawing.SystemColors.InfoText;
             this.labelAddX.Location = new System.Drawing.Point(711, 15);
             this.labelAddX.Name = "labelAddX";
@@ -225,7 +228,7 @@
             // labelAddY
             // 
             this.labelAddY.AutoSize = true;
-            this.labelAddY.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.labelAddY.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold);
             this.labelAddY.ForeColor = System.Drawing.SystemColors.InfoText;
             this.labelAddY.Location = new System.Drawing.Point(711, 43);
             this.labelAddY.Name = "labelAddY";

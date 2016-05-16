@@ -20,7 +20,7 @@ namespace FSMProject
                 isRight = flag;
             }
         }
-
+        
         static List<State> statesList = new List<State>(0);
         
         public static void Reset()

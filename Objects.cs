@@ -134,7 +134,7 @@ namespace FSMProject
                 AttemptMove(dir);
                 dir = ChooseDirectionToCurrentTarget();
             }
-
+            
             curTar.color = "Green";
         }
 
@@ -173,7 +173,7 @@ namespace FSMProject
             do
             {
                 step = ChooseRandStep(dir);
-                rob.MakeStep(step, 400);
+                rob.MakeStep(step, 1);
 
                 Interface.LrnStepAdd(); //плюс шаг, потраченный на обучение
 
@@ -190,7 +190,7 @@ namespace FSMProject
         void AttemptMove(Direction dir)
         {
             if (Machine.RightOutputExistsForInput(dir.symbol))
-                rob.MakeStep((Action)Machine.GetRightOutputForInput(dir.symbol), 400);
+                rob.MakeStep((Action)Machine.GetRightOutputForInput(dir.symbol), 1);
             else
                 LearnToMove(dir);
         }

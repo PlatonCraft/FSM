@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace FSMProject
@@ -15,15 +16,12 @@ namespace FSMProject
         public TextBox getTxtDist() { return tbDist; }
         public TextBox getTxtLrnSteps() { return tbLrnSteps; }
 
-        private void Picture_Click(object sender, EventArgs e)
-        {
-            // MessageBox.Show(new Random().Next(0, 2).ToString());
-        }
-
         private void FSMForm_Load(object sender, EventArgs e)
         {
             Interface.Init(this);
             FSMBase.InitObjects();
+
+            FSMBase.Test(this);
         }
 
         private void FSMForm_KeyDown(object sender, KeyEventArgs e)
@@ -85,11 +83,6 @@ namespace FSMProject
             }
            
         }
-
-        private void btnAddTar_Click(object sender, EventArgs e)
-        {
-            FSMBase.AddTarget(Convert.ToInt32(tbAddX.Text), Convert.ToInt32(tbAddY.Text));
-        }
     }
 
     static class FSMBase
@@ -119,6 +112,23 @@ namespace FSMProject
             curRob.ReachTargetsAddOrder(Target.tarList);
         }
 
+        public static void Test(FSMForm form)
+        {
+            TextBox txtLrnSteps = form.getTxtLrnSteps();
+            int[] steps = new int[1000];
+
+            for (int i = 0; i < 1000; i++)
+            {
+                new Target(4, 4); new Target(-4, 4); new Target(-4, -4); new Target(4, -4);
+                Interface.RefreshPlane();
+                curRob.ReachTargetsAddOrder(Target.tarList);
+                steps[i] = Convert.ToInt32(txtLrnSteps.Text);
+                Reset();
+            }
+
+            MessageBox.Show(steps.Average().ToString());
+        }
+        
         public static void Reset()
         {
             Machine.Reset();
