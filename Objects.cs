@@ -46,8 +46,8 @@ namespace FSMProject
         public static List<Robot> robList = new List<Robot>(0); 
 
         Logic logic;
-        public static Action up = new Action("up", 'u', 'Y'), right = new Action("right", 'r', 'X'),
-            down = new Action("down", 'd', 'Y'), left = new Action("left", 'l', 'X');
+        public static Action up = new Action("Шаг вверх", 'u'), right = new Action("Шаг вправо", 'r'),
+            down = new Action("Шаг вниз", 'd'), left = new Action("Шаг влево", 'l');
 
         public void MakeStep(Action dir, int delay)
         {
@@ -110,10 +110,12 @@ namespace FSMProject
         int distX, distY;
         int prevX, prevY;
 
+        static int learnDelay = 600, normalDelay = 300; //задержка при обучении и при движении по известным соответствиям
+
         Action[] actArr;
 
-        static Direction up = new Direction("Up", 'w', 'Y'), down = new Direction("Down", 's', 'Y'),
-            left = new Direction("Left", 'a', 'X'), right = new Direction("Right", 'd', 'X'); 
+        static Direction up = new Direction("Наверх", 'w', 'Y'), down = new Direction("Вниз", 's', 'Y'),
+            left = new Direction("Налево", 'a', 'X'), right = new Direction("Направо", 'd', 'X'); 
 
         public Logic(Robot rob)
         {
@@ -121,6 +123,12 @@ namespace FSMProject
             actArr = new Action[] { Robot.up, Robot.right, Robot.down, Robot.left };
         }
         
+        public static void ChangeDelay(int lrn, int norm)
+        {
+            learnDelay = lrn;
+            normalDelay = norm;
+        }
+
         public void ReachTarget(Target tar)
         {
             curTar = tar;
@@ -173,7 +181,7 @@ namespace FSMProject
             do
             {
                 step = ChooseRandStep(dir);
-                rob.MakeStep(step, 1);
+                rob.MakeStep(step, learnDelay);
 
                 Interface.LrnStepAdd(); //плюс шаг, потраченный на обучение
 
@@ -190,7 +198,7 @@ namespace FSMProject
         void AttemptMove(Direction dir)
         {
             if (Machine.RightOutputExistsForInput(dir.symbol))
-                rob.MakeStep((Action)Machine.GetRightOutputForInput(dir.symbol), 1);
+                rob.MakeStep((Action)Machine.GetRightOutputForInput(dir.symbol), normalDelay);
             else
                 LearnToMove(dir);
         }
@@ -248,15 +256,19 @@ namespace FSMProject
     /// <summary>
     /// Класс, условно описывающий действие, при совершении которого робот двигается в условном направлении.
     /// </summary>
-    class Action : Direction
+    class Action
     {
         static List<Action> actList = new List<Action>(0); //facepalm
 
-        public Action(string name, char symbol, char axis) : base("Move " + name, symbol, axis)
+        public string name;
+        public char symbol;
+
+        public Action(string name, char symbol)
         {
+            this.name = name;
+            this.symbol = symbol;
             actList.Add(this);
         }
-
 
         public static explicit operator Action(char sym) //и вот надо было менять char на целый новый тип?!!!
         {

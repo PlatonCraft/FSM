@@ -20,8 +20,6 @@ namespace FSMProject
         {
             Interface.Init(this);
             FSMBase.InitObjects();
-
-            FSMBase.Test(this);
         }
 
         private void FSMForm_KeyDown(object sender, KeyEventArgs e)
@@ -79,9 +77,14 @@ namespace FSMProject
             }
             catch (FormatException)
             {
-                MessageBox.Show("Coords should be integer numbers\nunder " + Interface.maxCoord + " and above -" + Interface.maxCoord);
+                MessageBox.Show("Координаты должны быть целыми числами\nменьше " + Interface.maxCoord + " и больше -" + Interface.maxCoord);
             }
            
+        }
+
+        private void btnTest_Click(object sender, EventArgs e)
+        {
+            FSMBase.Test(this);
         }
     }
 
@@ -115,18 +118,30 @@ namespace FSMProject
         public static void Test(FSMForm form)
         {
             TextBox txtLrnSteps = form.getTxtLrnSteps();
-            int[] steps = new int[1000];
+            int a;
+            int[] steps = new int[100000];
+            int[] distr = new int[13];
+            for(int i = 0; i < 13; i++)
+                distr[i] = 0;
 
-            for (int i = 0; i < 1000; i++)
+            Logic.ChangeDelay(0, 0);
+            for (int i = 0; i < 100000; i++)
             {
-                new Target(4, 4); new Target(-4, 4); new Target(-4, -4); new Target(4, -4);
-                Interface.RefreshPlane();
+                new Target(4, 4); new Target(-4, -4);
                 curRob.ReachTargetsAddOrder(Target.tarList);
-                steps[i] = Convert.ToInt32(txtLrnSteps.Text);
+                a = Convert.ToInt32(txtLrnSteps.Text);
+                steps[i] = a;
+                distr[a - 4]++;
                 Reset();
             }
+            Logic.ChangeDelay(600, 300);
 
-            MessageBox.Show(steps.Average().ToString());
+            string strDistr = "";
+            for (int i = 0; i < 13; i++)
+                strDistr += distr[i] + "; ";
+
+
+            MessageBox.Show("Average is" + steps.Average().ToString() + "\n" + strDistr);
         }
         
         public static void Reset()

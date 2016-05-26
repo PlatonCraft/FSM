@@ -45,6 +45,7 @@
             this.tbAddX = new System.Windows.Forms.TextBox();
             this.labelAddX = new System.Windows.Forms.Label();
             this.labelAddY = new System.Windows.Forms.Label();
+            this.btnTest = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbCoordPlane)).BeginInit();
             this.SuspendLayout();
             // 
@@ -236,6 +237,16 @@
             this.labelAddY.TabIndex = 9;
             this.labelAddY.Text = "Y";
             // 
+            // btnTest
+            // 
+            this.btnTest.Location = new System.Drawing.Point(549, 68);
+            this.btnTest.Name = "btnTest";
+            this.btnTest.Size = new System.Drawing.Size(75, 23);
+            this.btnTest.TabIndex = 10;
+            this.btnTest.Text = "Тест";
+            this.btnTest.UseVisualStyleBackColor = true;
+            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
+            // 
             // FSMForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -243,6 +254,7 @@
             this.BackColor = System.Drawing.Color.Silver;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.ClientSize = new System.Drawing.Size(857, 521);
+            this.Controls.Add(this.btnTest);
             this.Controls.Add(this.labelAddY);
             this.Controls.Add(this.labelAddX);
             this.Controls.Add(this.tbAddX);
@@ -288,6 +300,7 @@
         private System.Windows.Forms.TextBox tbAddX;
         private System.Windows.Forms.Label labelAddX;
         private System.Windows.Forms.Label labelAddY;
+        private System.Windows.Forms.Button btnTest;
     }
 }
 
